@@ -5,6 +5,7 @@ const urlAPI = 'https://api.spacexdata.com/v5/launches/';
 export const obtenerDatos = async () => {
     const respuesta = await fetch(urlAPI);
     const datos = await respuesta.json();
+    console.log(datos);
     return datos;
 }
 
@@ -13,18 +14,23 @@ export const crearTarjeta = (lanzamiento) => {
     const launchStatus = lanzamiento.success ? "Exitoso" : "Fallido";
     const tarjeta = document.createElement('div');
     tarjeta.classList.add('tarjeta');
+
+    const detalles = lanzamiento.details;
+    const detallesMostrados = detalles != null && detalles.length > 100 ? detalles.slice(0, 100) + "..." : detalles;
+
     tarjeta.innerHTML = `
         <h2>${lanzamiento.name}</h2>
         <img src="${lanzamiento.links.patch.small}" alt="${lanzamiento.name}"> 
         <p> ${launchStatus}</p>
         <p>Vuelo # ${lanzamiento.flight_number}</p>
         <p>Fecha: ${new Date(lanzamiento.date_utc).toLocaleDateString()}</p>
-        <p>Detalles: ${lanzamiento.details ? lanzamiento.details : 'No hay detalles disponibles'}</p>
+        <p class="mb-4 font-light text-gray-400">Detalles: ${detallesMostrados ? detallesMostrados : 'No hay detalles disponibles'}</p>
+        <a href="${lanzamiento.links.youtube_id ? 'https://www.youtube.com/watch?v=' + lanzamiento.links.youtube_id : '#'}" target="_blank">Ver en YouTube</a>
     `;
 
-    tarjeta.addEventListener('click', () => {
-        mostrarGrafico(lanzamiento);
-    });
+    // tarjeta.addEventListener('click', () => {
+    //     mostrarGrafico(lanzamiento);
+    // });
     return tarjeta;
 }
 
@@ -36,6 +42,8 @@ export const mostrarTarjetas = async () => {
     datos.forEach(lanzamiento => {
         const tarjeta = crearTarjeta(lanzamiento);
         contenedor.appendChild(tarjeta);
+
+        mostrarGrafico(lanzamiento);
     });
 }
 
@@ -47,6 +55,11 @@ const filtrarTarjetas = async () => {
 
     let launchNumber = document.getElementById('inputBusqueda').value;
 
+    if (!launchNumber || isNaN(launchNumber) || launchNumber < 1 || launchNumber > 205) {
+        alert('Ingresa un número de vuelo entre 1 y 205');
+        return;
+    }
+
     const datos = await obtenerDatos();
     const lanzamientosFiltrados = datos.filter(dato => dato.flight_number == launchNumber);
     lanzamientosFiltrados.forEach(lanzamiento => {
@@ -55,10 +68,27 @@ const filtrarTarjetas = async () => {
     });
 }
 
+
 let myChart;
 
-const mostrarGrafico = (lanzamiento) => {
+const mostrarGrafico = async () => {
     const ctx = document.getElementById('myChart').getContext('2d');
+
+    const respuesta = await fetch(urlAPI);
+    const datos = await respuesta.json();
+
+    let exitosos = 0;
+    let fallidos = 0;
+
+    datos.forEach(lanzamiento => {
+        if (lanzamiento.success) {
+            exitosos++;
+        } else {
+            fallidos++;
+        }
+    });
+
+    const total = datos.length;
 
     if (myChart) {
         myChart.destroy();
@@ -67,21 +97,25 @@ const mostrarGrafico = (lanzamiento) => {
     myChart = new Chart(ctx, {
         type: 'pie',
         data: {
-            labels: ['Número de Vuelo', 'Estado del Lanzamiento', 'Nombre del Cohete'],
+            labels: ['Exitosos', 'Fallidos', 'Total'],
             datasets: [{
-                data: [lanzamiento.flight_number, lanzamiento.success ? 1 : 0, lanzamiento.name],
+                data: [exitosos, fallidos, total],
                 backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
                     'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 99, 132, 0.2)',
                     'rgba(255, 206, 86, 0.2)'
                 ],
                 borderColor: [
-                    'rgba(255, 99, 132, 1)',
                     'rgba(54, 162, 235, 1)',
+                    'rgba(255, 99, 132, 1)',
                     'rgba(255, 206, 86, 1)'
                 ],
                 borderWidth: 1
             }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
         }
     });
 }
