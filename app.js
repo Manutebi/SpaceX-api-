@@ -26,7 +26,7 @@ export const crearTarjeta = (lanzamiento) => {
         <p>Vuelo # ${lanzamiento.flight_number}</p>
         <p>Fecha: ${new Date(lanzamiento.date_utc).toLocaleDateString()}</p>
         <p class="mb-4 font-light text-gray-400">Detalles: ${detallesMostrados ? detallesMostrados : 'No hay detalles disponibles'}</p>
-        <a href="${lanzamiento.links.youtube_id ? 'https://www.youtube.com/watch?v=' + lanzamiento.links.youtube_id : '#'}" target="_blank">Ver en YouTube</a>
+        <a href="${lanzamiento.links.youtube_id ? 'https://www.youtube.com/watch?v=' + lanzamiento.links.youtube_id : '#'}" class= "ytLink" target="_blank">Ver en YouTube</a>
     `;
 
     // tarjeta.addEventListener('click', () => {
