@@ -16,13 +16,19 @@ export const crearTarjeta = (lanzamiento) => {
     const tarjeta = document.createElement('div');
     tarjeta.classList.add('tarjeta');
 
+    // if (lanzamiento.success) {
+    //     tarjeta.launchStatus.classList.add('Exitoso')
+    // } else {
+    //     tarjeta.launchStatus.classList.add('Fallido')
+    // }
+
     const detalles = lanzamiento.details;
     const detallesMostrados = detalles != null && detalles.length > 100 ? detalles.slice(0, 100) + "..." : detalles;
 
     tarjeta.innerHTML = `
         <h2>${lanzamiento.name}</h2>
         <img src="${lanzamiento.links.patch.small}" alt="${lanzamiento.name}"> 
-        <p> ${launchStatus}</p>
+        <p class="${lanzamiento.success ? 'exitoso' : 'fallido'}"> ${launchStatus}</p>
         <p>Vuelo # ${lanzamiento.flight_number}</p>
         <p>Fecha: ${new Date(lanzamiento.date_utc).toLocaleDateString()}</p>
         <p class="mb-4 font-light text-gray-400">Detalles: ${detallesMostrados ? detallesMostrados : 'No hay detalles disponibles'}</p>

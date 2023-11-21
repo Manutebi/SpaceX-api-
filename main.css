@@ -5,6 +5,26 @@ body{
 }
 
 
+.exitoso{
+    display: flex;
+    justify-content: center;
+    background-color: rgb(18, 175, 18);
+    width: 5rem;
+    height: 1.5rem;
+    border-radius: 0.5rem;
+    padding: 0.1rem;
+}
+
+.fallido{
+    display: flex;
+    justify-content: center;
+    background-color: red;
+    width: 5rem;
+    height: 1.5rem;
+    border-radius: 0.5rem;
+    padding: 0.1rem;
+}
+
 
 .ytLink{
     background-color: #fff;
@@ -80,7 +100,6 @@ button:hover{
     font-family: orbitron;
     width: 100%;
     margin: 0 auto;
-    cursor: pointer;
     margin-top: 4rem;
 }
 
